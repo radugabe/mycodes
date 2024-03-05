@@ -1,0 +1,114 @@
+#!/bin/bash
+
+clear
+if [ $# -gt 0 ]
+then echo -e "dealership:argument error">&2
+echo "usage: dealership">&2
+exit 1
+fi
+BASE="$HOME/cars.list"
+APPOINTMENT="$HOME/appointments.list"
+while :
+do
+echo -e "
+carbase=$BASE
+appointmentbase=$APPOINTMENT
+DEALERSHIP DATABASE
+-------------------------------------
+add car to list (a)
+delete car from the list (d)
+edit list (e)
+search series in list (s)
+view complete list (v)
+add test drive appointment (t)
+view test drive appointments (q)
+delete ALL the appointments (n)
+clear screen (c)
+<ENTER> exit program
+Press a/d/e/s/v/t/q/n/c or <ENTER>:\c
+-------------------------------------
+"
+read answ
+case $answ in
+"") exit 0;;
+a|A) echo -e "Enter name to add:\c"
+read name
+if [ $name = "" ]
+then continue
+fi
+echo -e "Enter car serie (1,2,3,4,5,6,7,8):\c"
+read serie
+echo -e "Enter model:\c"
+read model
+echo -e "Enter amount of km:\c"
+read km
+echo -e "Enter year:\c"
+read year
+echo -e "Enter cubic capacity:\c"
+read capacity
+echo -e "Enter horse power:\c"
+read hp
+echo -e "Enter chassis series (identification number):\c"
+read chassis
+echo -e "Enter price:\c"
+read price
+echo -e "$name\t\t$serie\t\t$model\t\t$km\t\t$year\t\t$capacity\t\t\t$hp\t\t\t$chassis\t\t\t$price">>$BASE
+sort -o $BASE $BASE
+;;
+c|C) clear
+;;
+d|D) echo -e "Enter chassis serie to delete (<ENTER> to exit):\c"
+read chassis
+if [ $chassis = "" ]
+then continue
+fi
+sed -e "/$chassis/d" $BASE > $BASE.new
+mv $BASE.new $BASE
+;;
+n|N) echo -e "Type "DELETE" to confirm or press <Control + C> to deny:\c"
+read name
+if [ $name = "" ]
+then continue
+fi
+sed -i '/$name/d' $APPOINTMENT > $APPOINTMENT.new
+mv $APPOINTMENT.new $APPOINTMENT
+;;
+e|E) pico proiect
+;;
+t|T) echo -e "Enter chassis series (identification number):\c"
+read number
+echo -e "Enter the tester's name:\c"
+read testername
+echo -e "Enter tester's phone number:\c"
+read testernumber
+echo -e "Enter appointment's date(DDMMYY):\c"
+read date
+echo -e "$number\t\t$testername\t\t$testernumber\t\t$date">>$APPOINTMENT
+sort -o $APPOINTMENT $APPOINTMENT
+;;
+q|Q) echo -e "\n\t TEST DRIVE APPOINTMENTS\n\t-------------------"
+more $APPOINTMENT
+echo -e "\n Tap <ENTER>\c"
+read answ
+;;
+s|S) echo -e "\n Enter the serie to search:\c"
+read serie
+grep -i $serie $BASE > /dev/null
+if [ "$?" -eq 0 ]
+then
+echo -e "\n--------------------"
+grep -i $serie $BASE
+echo -e "\n--------------------"
+else
+echo "$serie not found in the dealership!"
+fi
+;;
+v|V) echo -e "\n\t Dealership\n\t---------------------- \n NAME\t\t SERIE\t\t MODEL\t\t KM\t\t YEAR\t\t CUBIC CAPACITY\t\t HORSE POWER\t\t IDENTIFICATION NUMBER\t\t PRICE"
+more $BASE
+echo -e "\n Tap <ENTER>\c"
+read answ
+;;
+*) echo -e "Not a valid command!"
+;;
+esac
+done
