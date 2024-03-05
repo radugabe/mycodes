@@ -1,3 +1,5 @@
+# Program de manageriat un Dealership de masini.
+
 #!/bin/bash
 
 clear
